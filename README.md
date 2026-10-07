@@ -8,6 +8,30 @@ Plug in a Rubber Ducky and USBShield catches it in under a second. Copy 100 MB o
 
 ---
 
+## ⚠️ Your antivirus will flag the test files — here's why
+
+If Windows Defender or another antivirus quarantines something during download or extraction, it's almost certainly reacting to the files inside `usb_payloads/`. Those files are **intentionally designed to look like malware** — that's the entire point of them. You can't test a tool that detects ransomware signatures without having a file that has ransomware signatures.
+
+Specifically, what gets flagged:
+
+- **`payload.ps1`** — contains real PowerShell attack patterns: `Invoke-Mimikatz`, `vssadmin delete shadows`, `IEX DownloadString`, `ExecutionPolicy Bypass`. These are the exact strings USBShield is trained to detect.
+- **`ransomware_sim.exe`** — a binary with a valid PE header and near-maximum entropy (~7.99 bits/byte), identical in structure to a UPX-packed or encrypted payload.
+- **`invoice.pdf`** — a PE executable disguised with a .pdf extension, used to test masked executable detection.
+
+The main USBShield Python source code contains nothing that should trigger any scanner.
+
+**The right way to handle this** is not to disable your antivirus — that's a terrible habit and exactly what malware authors want you to do. Instead, add a folder exclusion for the project directory in Windows Defender:
+
+1. Open **Windows Security → Virus & threat protection → Manage settings**
+2. Scroll to **Exclusions → Add or remove exclusions**
+3. Add the folder where you extracted USBShield
+
+Or, if you only need the core tool and not the test files, simply delete the `usb_payloads/` folder entirely after extraction. USBShield works fine without it — those files only exist for testing the scanner against a real drive.
+
+If you want to verify the source yourself before running anything, every `.py` file in this repo is plain readable Python. No compiled binaries, no obfuscation.
+
+---
+
 ## What it protects against
 
 USBShield covers 15 different USB attack vectors — here's what that actually means in practice:
@@ -143,3 +167,7 @@ colorama    Console output (minor)
 Install all at once: `pip install -r requirements.txt`
 
 ---
+
+## License
+
+MIT — do what you want with it, just don't use it to build something that hurts people.
