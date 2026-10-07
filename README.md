@@ -168,6 +168,3 @@ Install all at once: `pip install -r requirements.txt`
 
 ---
 
-## License
-
-MIT — do what you want with it, just don't use it to build something that hurts people.
